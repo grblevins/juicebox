@@ -135,6 +135,20 @@ async function updateUser(id, fields = {}) {
       }
   }
 
+  async function getUserByUsername(username) {
+    try {
+      const { rows: [user] } = await client.query(`
+        SELECT *
+        FROM users
+        WHERE username=$1;
+      `, [username]);
+  
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async function getAllTags() {
     try {
       const { rows } = await client.query(`SELECT * FROM tags;`);
@@ -155,5 +169,6 @@ module.exports = {
   getPostsByUser,
   getUserById,
   getAllPosts,
-  getAllTags
+  getAllTags,
+  getUserByUsername
 }
