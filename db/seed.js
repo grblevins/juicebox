@@ -14,12 +14,11 @@ const {
       console.log("Starting to drop tables...");
 
       await client.query(`
-        DROP TABLE IF EXISTS posts;
+      DROP TABLE IF EXISTS post_tags;
+      DROP TABLE IF EXISTS posts;
+      DROP TABLE IF EXISTS users;
+      DROP TABLE IF EXISTS tags;
       `)
-  
-      await client.query(`
-        DROP TABLE IF EXISTS users;
-      `);
   
       console.log("Finished dropping tables!");
     } catch (error) {

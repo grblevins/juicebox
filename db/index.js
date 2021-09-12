@@ -72,20 +72,24 @@ async function updateUser(id, fields = {}) {
     }
   }
 
-  async function updatePost(id, {
-    title,
-    content,
-    active
-  }) {
+  async function updatePost(id, fields = {}) {
+
+    delete fields.tags;
+
+    const setString = Object.keys(fields).map(
+        (key, index) => `"${ key }"=$${ index + 1 }`
+    ).join(', ');
     try {
-      const { rows: [ post ] } = await client.query(`
-        UPDATE posts
-        SET "title"='
-        WHERE id=${ id }
-        RETURNING *;
-      `, Object.values(fields));
+        if (setString.length) {
+            const {rows: [post] } = await client.query(`
+            UPDATE posts
+            SET ${ setString }
+            WHERE id=${ id }
+            RETURNING *;
+            `, Object.values(fields));
   
-      return post;
+            return post;
+        }
     } catch (error) {
       throw error;
     }
@@ -93,7 +97,7 @@ async function updateUser(id, fields = {}) {
 
   async function getAllPosts() {
     try {
-        const { rows } = await client.query(`SELECT "authorId", title, content FROM posts;`);
+        const { rows } = await client.query(`SELECT id, "authorId", title, content FROM posts;`);
         return rows;
 
     } catch (error) {
@@ -116,19 +120,13 @@ async function updateUser(id, fields = {}) {
 
   async function getUserById(userId) {
     try {
-        const { rows } = client.query(`
-        SELECT ${userId} FROM users
-        `);
-        
-        if(!rows || !rows.length){
-            return null
-        } else if (rows || rows.length) {
-            delete rows.password;
-            const posts = await getPostsByUser(userId);
-            rows.posts = posts
-            
-            return rows;
-        }
+        const queryString = `
+        SELECT * FROM users
+        WHERE id=${userId};
+        `;
+        console.log(queryString);
+        const {rows: [user]} = await client.query(queryString);
+        return user;
           
     } catch(error) {
         console.error(error)
