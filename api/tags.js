@@ -11,10 +11,4 @@ tagsRouter.get('/', async (req, res) => {
     });
 });
 
-tagsRouter.get('/', (req, res) => {
-    res.send({
-        tags: []
-    });
-});
-
 module.exports = tagsRouter;
